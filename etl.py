@@ -33,7 +33,7 @@ def get_summonerId(my_region1: str) ->  list:
 
     Returns
     -------
-    * top10_summonerId_list: list
+    * list
         A list consisting of player names.   
     '''
 
@@ -56,7 +56,7 @@ def get_puuid(my_region1: str, summonerId_list: list) ->  list:
 
     Returns
     -------
-    * puuid_list: list
+    * list
         A list consisting of player puuid's.   
     '''
 
@@ -76,7 +76,7 @@ def get_match_id(my_region2: str, puuid_list) ->  pd.DataFrame():
 
     Returns
     -------
-    * match_id_list: list
+    * list
         A list consisting of match_id's.   
     '''
 
@@ -97,7 +97,7 @@ def get_match_data(my_region2:str, match_id_list: list) ->  dict:
 
     Returns
     -------
-    * match_data_dict: dict
+    * dict
         A dictionary consisting of key value pair match_id: match_data.   
     '''
 
@@ -115,7 +115,7 @@ def get_match_metadata(match_data: dict) ->  pd.DataFrame():
 
     Returns
     -------
-    * match_metadata: pd.DataFrame()
+    * pd.DataFrame()
         A Pandas DataFrame consisting of match metadata for the match data supplied.   
     '''
 
@@ -152,7 +152,7 @@ def get_match_player_metadata(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     Returns
     -------
-    * match_player_metadata: pd.DataFrame()
+    * pd.DataFrame()
         A Pandas DataFrame consisting of player metadata for the match data supplied.   
     '''   
 
@@ -175,7 +175,7 @@ def get_match_player_traits(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     Returns
     -------
-    * match_player_traits: pd.DataFrame()
+    * pd.DataFrame()
         A Pandas DataFrame consisting of player traits for the match data supplied.   
     '''   
 
@@ -199,7 +199,7 @@ def get_match_player_units(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     Returns
     -------
-    * match_player_units: pd.DataFrame()
+    * pd.DataFrame()
         A Pandas DataFrame consisting of player units for the match data supplied.   
     '''   
 

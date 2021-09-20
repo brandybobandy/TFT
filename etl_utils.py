@@ -33,6 +33,11 @@ def list_to_sql_values(alist):
     ----------
     * alist: list
         A list.
+
+    Returns
+    -------
+    * list
+        A list of values to be inserted into an SQL Array type.
     
     """
 

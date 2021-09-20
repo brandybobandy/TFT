@@ -15,7 +15,7 @@ def create_match_data_table() :
 
     Returns
     -------
-    str
+    * str
         An SQL CREATE TABLE statement.
     """
 
@@ -37,7 +37,7 @@ def create_player_metadata_table():
 
     Returns
     -------
-    str
+    * str
         An SQL CREATE TABLE statement.
     """
     

@@ -16,21 +16,15 @@ def get_database_creds() -> dict:
     Returns:
     --------
     * dict
-        A dictionary with DB credentials.
+        DB credentials.
     """
-
-    user = os.environ.get('RIOT_DB_USER')
-    password = os.environ.get('RIOT_DB_PASSWORD')
-    db = os.environ.get('RIOT_DB_DBNAME')
-    host = os.environ.get('RIOT_DB_HOST')
-    port = int(os.environ.get('RIOT_DB_PORT'))
     
     return {
-        'user': user,
-        'password': password,
-        'db': db,
-        'host': host,
-        'port': port
+        'user': os.environ.get('RIOT_DB_USER'),
+        'password': os.environ.get('RIOT_DB_PASSWORD'),
+        'db': os.environ.get('RIOT_DB_DBNAME'),
+        'host': os.environ.get('RIOT_DB_HOST'),
+        'port': int(os.environ.get('RIOT_DB_PORT'))
     }
 
 def get_api_key() -> str:
