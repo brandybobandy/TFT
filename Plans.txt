@@ -1,0 +1,19 @@
+Plans moving forward:
+
+1) Great Expectations
+    -Check Data quality
+2) DBT
+    -Move data from staging tables to useful tables
+3) Airflow
+    -Orchestrate the entire pipeline
+----------------------------------------------------
+
+Airflow orchestrates the following with an operator(s) for each task:
+
+1) Python extracts raw json from Riot API
+2) Great Expectations validates raw json
+3) Python uploads raw json to Postgres staging tables
+4) Great Expectations validates raw json upload into Postgres
+5) DBT transforms raw json to useful tables inside Postgres
+6) Great Expectations validates DBT transformations inside Postgres
+7) ...
