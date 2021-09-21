@@ -64,7 +64,7 @@ def get_puuid(my_region1: str, summonerId_list: list) ->  list:
 
     return puuid_list
 
-def get_match_id(my_region2: str, puuid_list) ->  pd.DataFrame():
+def get_match_id(my_region2: str, puuid_list) ->  list:
     '''Gets match_id's for every puuid in list returned by get_summoner_puuid.
 
     Parameters
@@ -281,12 +281,12 @@ def run():
     print(f"get_summonerId runtime: {time.time() - func_start} seconds,")
 
     func_start = time.time()
-    puud_list = get_puuid(my_region1, summonerName_list)
-    print(f"get_summoner_puuid runtime: {time.time() - func_start} seconds,")
+    puuid_list = get_puuid(my_region1, summonerName_list)
+    print(f"get_puuid runtime: {time.time() - func_start} seconds,")
 
     func_start = time.time()
-    match_list = get_match_id(my_region2, puud_list)
-    print(f"get_summoner_match runtime: {time.time() - func_start} seconds,")
+    match_list = get_match_id(my_region2, puuid_list)
+    print(f"get_match_id runtime: {time.time() - func_start} seconds,")
 
     func_start = time.time()
     match_data_dict = get_match_data(my_region2, match_list)
