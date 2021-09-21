@@ -6,7 +6,7 @@ Plans moving forward:
     -Move data from staging tables to useful tables
 3) Airflow
     -Orchestrate the entire pipeline
-----------------------------------------------------
+------------------------------------------------------------------------
 
 Airflow orchestrates the following with an operator(s) for each task:
 
@@ -17,3 +17,28 @@ Airflow orchestrates the following with an operator(s) for each task:
 5) DBT transforms raw json to useful tables inside Postgres
 6) Great Expectations validates DBT transformations inside Postgres
 7) ...
+
+-----------------------------------------------------------------------
+
+Further improvements:
+* memory_profiler
+* yield / yield from in api request
+* change batch execution of all matches to per match for functions:
+    - get_match_data
+    - get_match_metadata
+    - get_player_metadata
+    - get_player_units
+    - get_player_traits
+
+-----------------------------------------------------------------------
+
+Notes:
+* Riot API limitations
+    - 20 requests / second
+    - 100 requests/ 2 minutes
+    - Running 10 players & 10 matches/player
+        - Runtime ~ 120 secods
+        - get_match_data() gets held up at ~ 90th match
+            - set 9 matches / player to 
+    - Running 10 players and 5 matches / player (AFTER UPDATING BULK INSERT)
+        - Runtime ~ 16 seconds

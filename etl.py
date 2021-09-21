@@ -21,7 +21,7 @@ watcher = TftWatcher(api_key=api_key)
 
 # Parameters for API calls.
 number_players = 10
-number_matches = 10
+number_matches = 5
 
 def get_summonerId(my_region1: str) ->  list:
     '''Gets summoner id's for top n players in Challenger.
@@ -100,9 +100,8 @@ def get_match_data(my_region2:str, match_id_list: list) ->  dict:
     * dict
         A dictionary consisting of key value pair match_id: match_data.   
     '''
-
     match_data_dict = {match_id: watcher.match.by_id(region = my_region2, match_id = match_id) for match_id in match_id_list}
-    
+
     return match_data_dict
 
 def get_match_metadata(match_data: dict) ->  pd.DataFrame():
@@ -142,7 +141,7 @@ def get_match_metadata(match_data: dict) ->  pd.DataFrame():
 
     return match_metadata
 
-def get_match_player_metadata(match_data: pd.DataFrame()) ->  pd.DataFrame():
+def get_player_metadata(match_data: pd.DataFrame()) ->  pd.DataFrame():
     '''Gets player metadata for values (match_data) in dict returned by get_match_data.
 
     Parameters
@@ -165,7 +164,7 @@ def get_match_player_metadata(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     return match_player_metadata
 
-def get_match_player_traits(match_data: pd.DataFrame()) ->  pd.DataFrame():
+def get_player_traits(match_data: pd.DataFrame()) ->  pd.DataFrame():
     '''Gets player traits for values (match_data) in dict returned by get_match_data.
 
     Parameters
@@ -189,7 +188,7 @@ def get_match_player_traits(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     return match_player_traits
 
-def get_match_player_units(match_data: pd.DataFrame()) ->  pd.DataFrame():
+def get_player_units(match_data: pd.DataFrame()) ->  pd.DataFrame():
     '''Gets player units for values (match_data) in dict returned by get_match_data.
 
     Parameters
@@ -258,6 +257,8 @@ def pd_to_postgres(df: pd.DataFrame(), table: str):
             
         if table_exists or (not table_exists and table_created):
             insert_df(df, cur, table)
+
+            print(f'-Inserted data into {table}')
         
 
 
@@ -269,7 +270,7 @@ def run():
     3)  get_match_id()
     4)  get_match_data
     5a) get_match_metadata()
-    5b) get_match_player_metadata()
+    5b) get_player_metadata()
     5c) get_player_units()
     5d) get_player_units()
     """
@@ -292,31 +293,64 @@ def run():
     match_data_dict = get_match_data(my_region2, match_list)
     print(f"get_match_data runtime: {time.time() - func_start} seconds\n")
 
+    match_metadata_list, player_metadata_list, player_units_list, player_traits_list = ([] for i in range(4))
+
     print(f"Beginning match data extraction / insertion:\n")
     extractions_inserts_start = time.time()
     for match_id, match_data in match_data_dict.items():
         
-        print(f'match_id: {match_id}')
+        # print(f'match_id: {match_id}')
         
-        match_metadata = get_match_metadata(match_data).astype(str)
-        pd_to_postgres(match_metadata, "match_data")
+        match_metadata = get_match_metadata(match_data)
+        match_metadata = match_metadata.astype(str)
+        match_metadata_list.append(match_metadata)
+        
+        player_metadata = get_player_metadata(match_data)
+        player_metadata.insert(1, 'match_id', match_id)
+        player_metadata = player_metadata.astype(str)
+        player_metadata_list.append(player_metadata)
+        
+        player_traits = get_player_traits(match_data)
+        player_traits.insert(1, 'match_id', match_id)
+        player_traits = player_traits.astype(str)
+        player_traits_list.append(player_traits)
+
+        player_units = get_player_units(match_data)
+        player_units.insert(1, 'match_id', match_id)
+        player_units = player_units.astype(str)
+        player_units_list.append(player_units)
+
+        # match_metadata = get_match_metadata(match_data).astype(str)
+        # pd_to_postgres(match_metadata, "match_data")
        
-        player_metadata = get_match_player_metadata(match_data).astype(str)
-        player_metadata['match_id'] = match_id
-        move_column_inplace(player_metadata, 'match_id', 1)
-        pd_to_postgres(player_metadata, "player_metadata")
+        # player_metadata = get_player_metadata(match_data).astype(str)
+        # player_metadata['match_id'] = match_id
+        # move_column_inplace(player_metadata, 'match_id', 1)
+        # pd_to_postgres(player_metadata, "player_metadata")
 
-        player_units = get_match_player_units(match_data).astype(str)
-        player_units['match_id'] = match_id
-        move_column_inplace(player_units, 'match_id', 1)
-        pd_to_postgres(player_units, "player_units")
+        # player_units = get_player_units(match_data).astype(str)
+        # player_units['match_id'] = match_id
+        # move_column_inplace(player_units, 'match_id', 1)
+        # pd_to_postgres(player_units, "player_units")
 
-        player_traits = get_match_player_traits(match_data).astype(str)
-        player_traits['match_id'] = match_id
-        move_column_inplace(player_traits, 'match_id', 1)
-        pd_to_postgres(player_traits, "player_traits")
+        # player_traits = get_player_traits(match_data).astype(str)
+        # player_traits['match_id'] = match_id
+        # move_column_inplace(player_traits, 'match_id', 1)
+        # pd_to_postgres(player_traits, "player_traits")
 
-        print(f"-Extracted data from Pandas DataFrames and inserted into PostgreSQL tables successfully.\n")
+        # print(f"-Extracted data from Pandas DataFrames and inserted into PostgreSQL tables successfully.\n")
+    
+    match_metadata = pd.concat(match_metadata_list)
+    player_metadata = pd.concat(player_metadata_list)
+    player_units = pd.concat(player_units_list)
+    player_traits= pd.concat(player_traits_list)
+
+    pd_to_postgres(match_metadata, "match_data")
+    pd_to_postgres(player_metadata, "player_metadata")
+    pd_to_postgres(player_units, "player_units")
+    pd_to_postgres(player_traits, "player_traits")
+
+    print(f"-Extracted data from Pandas DataFrames and inserted into PostgreSQL tables successfully.\n")
     
     print(f"Extract/Insert runtime: {time.time() - extractions_inserts_start} seconds.\n")
 
