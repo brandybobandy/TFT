@@ -299,8 +299,6 @@ def run():
     extractions_inserts_start = time.time()
     for match_id, match_data in match_data_dict.items():
         
-        # print(f'match_id: {match_id}')
-        
         match_metadata = get_match_metadata(match_data)
         match_metadata = match_metadata.astype(str)
         match_metadata_list.append(match_metadata)
@@ -319,26 +317,6 @@ def run():
         player_units.insert(1, 'match_id', match_id)
         player_units = player_units.astype(str)
         player_units_list.append(player_units)
-
-        # match_metadata = get_match_metadata(match_data).astype(str)
-        # pd_to_postgres(match_metadata, "match_data")
-       
-        # player_metadata = get_player_metadata(match_data).astype(str)
-        # player_metadata['match_id'] = match_id
-        # move_column_inplace(player_metadata, 'match_id', 1)
-        # pd_to_postgres(player_metadata, "player_metadata")
-
-        # player_units = get_player_units(match_data).astype(str)
-        # player_units['match_id'] = match_id
-        # move_column_inplace(player_units, 'match_id', 1)
-        # pd_to_postgres(player_units, "player_units")
-
-        # player_traits = get_player_traits(match_data).astype(str)
-        # player_traits['match_id'] = match_id
-        # move_column_inplace(player_traits, 'match_id', 1)
-        # pd_to_postgres(player_traits, "player_traits")
-
-        # print(f"-Extracted data from Pandas DataFrames and inserted into PostgreSQL tables successfully.\n")
     
     match_metadata = pd.concat(match_metadata_list)
     player_metadata = pd.concat(player_metadata_list)

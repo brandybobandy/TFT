@@ -29,6 +29,8 @@ Further improvements:
     - get_player_metadata
     - get_player_units
     - get_player_traits
+* add variable annotations
+    - e.g. primes = list[] ---> primes: List[int] = []
 
 -----------------------------------------------------------------------
 
