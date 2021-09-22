@@ -1,3 +1,6 @@
+from pprint import pprint
+from ruamel.yaml import YAML
+
 from great_expectations.core.expectation_configuration import ExpectationConfiguration
 from great_expectations.validator.validator import Validator
 import pandas as pd
@@ -82,9 +85,43 @@ def run():
         expectation_suite=suite
     )
     
-    print(validator.head())
-    print(validator.validate)
-    validator.save_expectation_suite(suite)
+    context.save_expectation_suite(suite)
+    
+    pprint(context.get_available_data_asset_names())
+    context.list_expectation_suite_names()
+
+    checkpoint_config = """
+    name: default_checkpoint_name
+    config_version: 1
+    class_name: SimpleCheckpoint
+    validations:
+        - batch_request:
+            datasource_name: pandas_datasource
+            data_connector_name: default_runtime_data_connector_name
+            data_asset_name: default_data_asset_name
+    expectation_suite_name: test_suite
+    """
+
+    yaml = YAML()
+    context.test_yaml_config(yaml_config=checkpoint_config)
+    context.add_checkpoint(**yaml.load(checkpoint_config))
+
+    context.run_checkpoint(
+        checkpoint_name="default_checkpoint_name",
+        batch_request={
+            "runtime_parameters": {
+                "batch_data": df,
+            },
+            "batch_identifiers": {
+                "default_identifier_name": "default_identifier",
+            }
+        },
+        run_name="test_run"
+    )
+
+    context.build_data_docs()
+
+    context.open_data_docs()
 
 if __name__=="__main__":
     run()
