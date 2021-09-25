@@ -15,6 +15,7 @@ my_region2 = 'AMERICAS'
 
 # Riot API key.
 api_key = get_api_key()
+print(api_key)
 
 # Initialize TftWatcher object that abstracts Riot API requests.
 watcher = TftWatcher(api_key=api_key)

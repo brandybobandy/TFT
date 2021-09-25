@@ -10,6 +10,10 @@ Methods:
 
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 def get_database_creds() -> dict:
     """Gets DB credentials as a dictionary.
 
@@ -20,11 +24,11 @@ def get_database_creds() -> dict:
     """
     
     return {
-        'user': os.environ.get('RIOT_DB_USER'),
-        'password': os.environ.get('RIOT_DB_PASSWORD'),
-        'db': os.environ.get('RIOT_DB_DBNAME'),
-        'host': os.environ.get('RIOT_DB_HOST'),
-        'port': int(os.environ.get('RIOT_DB_PORT'))
+        'user': os.environ.get('DB_USER'),
+        'password': os.environ.get('DB_PASSWORD'),
+        'db': os.environ.get('DB_DBNAME'),
+        'host': os.environ.get('DB_HOST'),
+        'port': int(os.environ.get('DB_PORT'))
     }
 
 def get_api_key() -> str:
@@ -36,5 +40,5 @@ def get_api_key() -> str:
         Riot API key.
     """
 
-    riot_api_key = os.environ.get('RIOT_API_KEY')
+    riot_api_key = os.environ.get('API_KEY')
     return riot_api_key
