@@ -53,7 +53,7 @@ def get_puuid(summonerId_list: list, region1: str = 'NA1') ->  list:
 
     return puuid_list
 
-def get_match_id(puuid_list, n_matches: int = 10, region2: str = 'AMERICAS') ->  list:
+def get_match_id(puuid_list, n_matches: int = 9, region2: str = 'AMERICAS') ->  list:
     '''Gets match_id's for every puuid in list returned by get_summoner_puuid.
 
     Parameters
