@@ -9,14 +9,6 @@ from config import get_database_creds, get_api_key
 from db_utils import create_match_data_table, create_player_metadata_table, create_player_traits_table, create_player_units_table
 from etl_utils import move_column_inplace, list_to_sql_values
 
-# # Regions required for API Call's.
-# region1 = 'NA1'
-# region2 = 'AMERICAS'
-
-# # Parameters for API calls.
-# n_players = 10
-# n_matches = 5
-
 # Initialize TftWatcher object that abstracts Riot API requests.
 watcher = TftWatcher(api_key=get_api_key())
 
