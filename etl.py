@@ -9,27 +9,23 @@ from config import get_database_creds, get_api_key
 from db_utils import create_match_data_table, create_player_metadata_table, create_player_traits_table, create_player_units_table
 from etl_utils import move_column_inplace, list_to_sql_values
 
-# Regions required for API Call's.
-my_region1 = 'NA1'
-my_region2 = 'AMERICAS'
+# # Regions required for API Call's.
+# region1 = 'NA1'
+# region2 = 'AMERICAS'
 
-# Riot API key.
-api_key = get_api_key()
-print(api_key)
+# # Parameters for API calls.
+# n_players = 10
+# n_matches = 5
 
 # Initialize TftWatcher object that abstracts Riot API requests.
-watcher = TftWatcher(api_key=api_key)
+watcher = TftWatcher(api_key=get_api_key())
 
-# Parameters for API calls.
-number_players = 10
-number_matches = 5
-
-def get_summonerId(my_region1: str) ->  list:
+def get_summonerId(n_players: int = 10, region1: str = 'NA1') ->  list:
     '''Gets summoner id's for top n players in Challenger.
 
     Parameters
     ----------
-    * my_region1: str
+    * region1: str
         Region 'NA1' to be used in API call.
 
     Returns
@@ -38,19 +34,19 @@ def get_summonerId(my_region1: str) ->  list:
         A list consisting of player names.   
     '''
 
-    challenger_request = watcher.league.challenger(region=my_region1)
+    challenger_request = watcher.league.challenger(region=region1)
     challenger_data = challenger_request['entries']
     challenger_df = pd.DataFrame(challenger_data)
-    top10_summonerId_list = challenger_df.sort_values(by='leaguePoints', ascending=False).head(n = number_players)['summonerId'].tolist()
+    top10_summonerId_list = challenger_df.sort_values(by='leaguePoints', ascending=False).head(n = n_players)['summonerId'].tolist()
     
     return top10_summonerId_list
 
-def get_puuid(my_region1: str, summonerId_list: list) ->  list:
+def get_puuid(summonerId_list: list, region1: str = 'NA1') ->  list:
     '''Gets summoner puuid's for every summonerID in list returned by get_summonerId.
 
     Parameters
     ----------
-    * my_region1: str
+    * region1: str
         Region 'NA1' to be used in API call.
     * summonerId_list: list
         A list consisting of player names returned by get_summonerId.
@@ -61,16 +57,16 @@ def get_puuid(my_region1: str, summonerId_list: list) ->  list:
         A list consisting of player puuid's.   
     '''
 
-    puuid_list = [watcher.summoner.by_id(region = my_region1, encrypted_summoner_id=summonerId)['puuid'] for summonerId in summonerId_list]
+    puuid_list = [watcher.summoner.by_id(region = region1, encrypted_summoner_id=summonerId)['puuid'] for summonerId in summonerId_list]
 
     return puuid_list
 
-def get_match_id(my_region2: str, puuid_list) ->  list:
+def get_match_id(puuid_list, n_matches: int = 10, region2: str = 'AMERICAS') ->  list:
     '''Gets match_id's for every puuid in list returned by get_summoner_puuid.
 
     Parameters
     ----------
-    * my_region2: str
+    * region2: str
         Region 'AMERICAS' to be used in API call.
     * puuid_list: list
         A list consisting of player puuid's returned by get_summoner_puuid.
@@ -81,17 +77,17 @@ def get_match_id(my_region2: str, puuid_list) ->  list:
         A list consisting of match_id's.   
     '''
 
-    match_id_request = [watcher.match.by_puuid(region = my_region2, puuid = puuid, count = number_matches) for puuid in puuid_list]
+    match_id_request = [watcher.match.by_puuid(region = region2, puuid = puuid, count = n_matches) for puuid in puuid_list]
     match_id_list = list(set([match_id for match_ids in match_id_request for match_id in match_ids]))
 
     return match_id_list
 
-def get_match_data(my_region2:str, match_id_list: list) ->  dict:   
+def get_match_data(match_id_list: list, region2: str = 'AMERICAS') ->  dict:   
     '''Gets match data for every match_id in list returned by get_summoner_match.
 
     Parameters
     ----------
-    * my_region2: str
+    * region2: str
         Region 'AMERICAS' to be used in API call.
     * match_id_list: list
         A list consisting of match_id's returned by get_summoner_match.
@@ -101,7 +97,7 @@ def get_match_data(my_region2:str, match_id_list: list) ->  dict:
     * dict
         A dictionary consisting of key value pair match_id: match_data.   
     '''
-    match_data_dict = {match_id: watcher.match.by_id(region = my_region2, match_id = match_id) for match_id in match_id_list}
+    match_data_dict = {match_id: watcher.match.by_id(region = region2, match_id = match_id) for match_id in match_id_list}
 
     return match_data_dict
 
@@ -142,7 +138,7 @@ def get_match_metadata(match_data: dict) ->  pd.DataFrame():
 
     return match_metadata
 
-def get_player_metadata(match_data: pd.DataFrame()) ->  pd.DataFrame():
+def get_player_metadata(match_data: dict) ->  pd.DataFrame():
     '''Gets player metadata for values (match_data) in dict returned by get_match_data.
 
     Parameters
@@ -165,7 +161,7 @@ def get_player_metadata(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     return match_player_metadata
 
-def get_player_traits(match_data: pd.DataFrame()) ->  pd.DataFrame():
+def get_player_traits(match_data: dict) ->  pd.DataFrame():
     '''Gets player traits for values (match_data) in dict returned by get_match_data.
 
     Parameters
@@ -189,7 +185,7 @@ def get_player_traits(match_data: pd.DataFrame()) ->  pd.DataFrame():
 
     return match_player_traits
 
-def get_player_units(match_data: pd.DataFrame()) ->  pd.DataFrame():
+def get_player_units(match_data: dict) ->  pd.DataFrame():
     '''Gets player units for values (match_data) in dict returned by get_match_data.
 
     Parameters
@@ -279,19 +275,19 @@ def run():
     print(f"Beginning ETL script.\n")
 
     func_start = time.time()
-    summonerName_list = get_summonerId(my_region1)
+    summonerName_list = get_summonerId()
     print(f"get_summonerId runtime: {time.time() - func_start} seconds,")
 
     func_start = time.time()
-    puuid_list = get_puuid(my_region1, summonerName_list)
+    puuid_list = get_puuid(summonerName_list)
     print(f"get_puuid runtime: {time.time() - func_start} seconds,")
 
     func_start = time.time()
-    match_list = get_match_id(my_region2, puuid_list)
+    match_list = get_match_id(puuid_list)
     print(f"get_match_id runtime: {time.time() - func_start} seconds,")
 
     func_start = time.time()
-    match_data_dict = get_match_data(my_region2, match_list)
+    match_data_dict = get_match_data(match_list)
     print(f"get_match_data runtime: {time.time() - func_start} seconds\n")
 
     match_metadata_list, player_metadata_list, player_units_list, player_traits_list = ([] for i in range(4))
