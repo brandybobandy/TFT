@@ -31,7 +31,7 @@ Further improvements:
     - get_player_traits
 * add variable annotations
     - e.g. primes = list[] ---> primes: List[int] = []
-
+* backoff for api call fails
 -----------------------------------------------------------------------
 
 Notes:
